@@ -1,0 +1,39 @@
+
+README
+________________________________________________________________________________________________________
+
+* CONTENTS OF THIS FILE
+	* Introduction
+	* How it works?
+________________________________________________________________________________________________________
+
+
+* Introduction	
+______________
+
+	This file attempts to respond to the questions provided at 
+	http://courses.washington.edu/ling571/ling571_WIN2015/hw/hw1/hw1.html as the write-up file for hw1.
+
+
+* How it works?
+__________________
+
+	- There are 3 types of input: 
+		1. Q & A 
+		2. Keyword/Phrases
+		3. Spoken text
+		
+	- PptManager.py: 
+		1. Receives raw input from user, output powerpoint file.
+		2. Pass valid raw input to SearchManager.py and receives a slide from SlideManager.py.
+
+	- SearchManager.py:
+		1. Takes valid raw input from PptManager.py and pass Search option and Search input to InfoAggregator.py.
+
+
+
+
+
+
+
+
