@@ -5,6 +5,7 @@ ________________________________________________________________________________
 * CONTENTS OF THIS FILE
 	* Introduction
 	* How it works?
+	* Extraction of knowledge graph
 ________________________________________________________________________________________________________
 	
 * Introduction
@@ -14,21 +15,44 @@ __________________
 * How it works?
 __________________
 
-	- There are 3 types of input: 
+	- 3 types of input: 
 		1. Q & A 
 		2. Keyword/Phrases
 		3. Spoken text
 
-	- PptManager.py: 
+	- PptManager: 
 		1. Receives raw input from user, output powerpoint file.
 		2. Pass valid raw input to SearchManager.py and receives a slide from SlideManager.py.
 
-	- SearchManager.py:
+	- SearchManager:
 		1. Takes valid raw input from PptManager.py and pass Search option and Search input to InfoAggregator.py.
 
+	- ContentManager:
+		1. Request for new contents
+		2. Process contents
 
+	- SearchManager:
+		1. Manages search requests
+		2. Process search results
 
+	- InfoExtractor:
+		1. Extracts wiki contents based on input
+		2. Ensures coherence of theme for all slide points (semantic similarity)
 
+	- InfoAggregator:
+		1. Request wiki information
+
+	- KnowledgeGraph:
+		1. Construct a hidden knowledge graph storing all slide points and titles
+
+* Extraction of knowledge graph
+__________________
+
+	- First determine the "important" tf-idf np entities.
+	- Extract its verb, process verb forms.
+	- Create triples, add to graph.
+	- "TRIPLET EXTRACTION FROM SENTENCES" http://ailab.ijs.si/dunja/SiKDD2007/Papers/Rusu_Trippels.pdf
+	
 
 
 
