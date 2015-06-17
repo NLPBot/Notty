@@ -22,8 +22,12 @@ class TripletExtractor(object):
 			return att | subj | pred | obj
 
 	# Returns a set containing attributes
-	def extractAttribute(self,word,siblings,uncles):
+	def extractAttribute(self,word):
 		result = Set([])
+		# Get siblings
+		siblings = self.getSiblings(self.tree,word)
+		uncle = self.getUncles(self.tree,word)
+
 		# if adjective(word) 
 		if 'J' in word.label():
 			# result <- all RB siblings 
@@ -41,19 +45,20 @@ class TripletExtractor(object):
 					# result <- all ADVP siblings
 					result = result | self.getADVPSiblings(siblings)
 
-		# if noun(word) or adjective(word) 
-		if 'N' in word.label() or 'J' in word.label():
-			# if uncle = PP 
-			if 'PP' in uncle.label():
-				# result <- uncle subtree
-				result.add(uncle)
-		# else
-		else:
-			# if verb(word) and (uncle = verb) 
-			if 'V' in word.label() and 'V' in uncle.label():
-				# result <- uncle subtree
-				result.add(uncle)
-		# if result ≠ failure then return result else return failure
+		for uncle in uncles:
+			# if noun(word) or adjective(word) 
+			if 'N' in word.label() or 'J' in word.label():
+				# if uncle = PP 
+				if 'PP' in uncle.label():
+					# result <- uncle subtree
+					result.add(uncle)
+			# else
+			else:
+				# if verb(word) and (uncle = verb) 
+				if 'V' in word.label() and 'V' in uncle.label():
+					# result <- uncle subtree
+					result.add(uncle)
+		# if result != failure then return result else return failure
 		return result
 
 	def extractSubject(self,subtree):
@@ -78,7 +83,8 @@ class TripletExtractor(object):
 		# else return failure 
 		return result
 
-	def extractObject(self,VP_sbtree,siblings):
+	def extractObject(self,VP_sbtree):
+		siblings = self.getSiblings(self.tree,VP_sbtree)
 		# siblings <- find NP, PP and ADJP siblings of VP_subtree 
 		# for each value in siblings do 
 		object = None
@@ -99,6 +105,31 @@ class TripletExtractor(object):
 		# if result != failure then return result 
 		# else return failure
 		return result
+
+	def getUncles(self,tree,target):
+		uncles = Set([])
+		found = False
+		for child in tree:
+			if target.label() in child.label():
+				found = True
+				break
+			uncles = uncles | self.getUncle(child,target)
+		if found == True:
+			uncles = self.getSiblings(self.tree,tree)
+		return uncles
+
+	def getSiblings(self,tree,target):
+		siblings = Set([])
+		found = False
+		for child in tree:
+			if target.label() in child.label():
+				found = True
+				break
+			siblings = siblings | self.getSiblings(child,target)
+		if found == True:
+			for child in tree:
+				siblings.add(child)
+		return siblings
 
 	def getVPSubtree(self):
 		for child in self.tree:
