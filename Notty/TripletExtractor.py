@@ -11,18 +11,47 @@ class TripletExtractor(object):
 	# Return a set consisting of triplet { subj, pred, obj }
 	def extract(self):
 		# First get all the sets
-		att = subj = pred = {}
-		att = self.extractAttribute()
-		subj = self.extractSubject()
-		pred = self.extractPredicate()
-		obj = self.extractObject()
+		subj = pred = obj = {}
+		subj = self.extractSubject(self.getNPSubtree())
+		pred = self.extractPredicate(self.getVPSubtree())
+		obj = self.extractObject(self.getVPSiblings())
 		# Handle Empty Sets
 		if len(att)==0 or len(att)==0 or len(att)==0:
 			return {}
 		else:
 			return att | subj | pred | obj
 
-	def extractAttribute(self,tree):
+	# Returns a set containing attributes
+	def extractAttribute(self,word):
+		result = None
+		# search among the word’s siblings 
+		# if adjective(word) 
+		if 'J' in word.label():
+			# result <- all RB siblings 
+			result = 
+		# else
+		else:
+			# if noun(word) 
+			if 'N' in word.label():
+				# result <- all DT, PRP$, POS, JJ, CD, ADJP, QP, NP siblings
+				result = 
+			# else
+			else:
+				# if verb(word)
+				if 'V' in word.label(): 
+					# result <- all ADVP siblings
+					result = 
+
+
+		# search among the word’s uncles
+		# if noun(word) or adjective(word) 
+			# if uncle = PP 
+				# result <- uncle subtree
+		# else
+			# if verb(word) and (uncle = verb) 
+				# result <- uncle subtree
+		# if result ≠ failure then return result else return failure
+
 		return {}
 
 	def extractSubject(self,subtree):
@@ -47,19 +76,44 @@ class TripletExtractor(object):
 		# else return failure 
 		return result
 
-	def extractObject(self,VP_sbtree):
+	def extractObject(self,VP_sbtree,siblings):
 		# siblings <- find NP, PP and ADJP siblings of VP_subtree 
-		#siblings = 
 		# for each value in siblings do 
+		object = None
+		for value in siblings:
+			value_label = value.label()
 			# if value = NP or PP 
+			if 'NP' in value_label or 'PP' in value_label:
 				# object <- first noun in value
+				object = self.FindFirstNoun()[0]
 			# else
+			if 'JJ' in value_label:
 				# object <- first adjective in value
+				object = value
 			# objectAttributes <- EXTRACT-ATTRIBUTES(object) 
+			objectAttributes = self.extractAttribute(object)
 		# result <- object | objectAttributes 
+		result = Set([object]) | objectAttributes
 		# if result != failure then return result 
 		# else return failure
-		return {}
+		return result
+
+	def getVPSubtree(self):
+		for child in self.tree:
+			if 'VP' in child.label():
+				return child
+
+	def getVPSiblings(self):
+		siblings = []
+		for child in self.tree:
+			if 'VP' not in child.label():
+				siblings.append(child)
+		return siblings
+
+	def getNPSubtree(self):
+		for child in self.tree:
+			if 'NP' in child.label():
+				return child
 
 	# Return first noun or none
 	def FindFirstNoun(self,subtree):
@@ -72,7 +126,7 @@ class TripletExtractor(object):
 			if 'NN' in n.label():
 				first_noun.add(n)
 		return first_noun
-		
+
 	# Return deepest verb or none
 	def FindDeepestVerb(self,VP_subtree,level):
 		level += 1
