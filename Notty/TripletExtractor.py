@@ -22,37 +22,39 @@ class TripletExtractor(object):
 			return att | subj | pred | obj
 
 	# Returns a set containing attributes
-	def extractAttribute(self,word):
-		result = None
-		# search among the word’s siblings 
+	def extractAttribute(self,word,siblings,uncles):
+		result = Set([])
 		# if adjective(word) 
 		if 'J' in word.label():
 			# result <- all RB siblings 
-			result = 
+			result = result | self.getRBSiblings(siblings)
 		# else
 		else:
 			# if noun(word) 
 			if 'N' in word.label():
 				# result <- all DT, PRP$, POS, JJ, CD, ADJP, QP, NP siblings
-				result = 
+				result = result | self.getMANYSiblings(siblings)
 			# else
 			else:
 				# if verb(word)
 				if 'V' in word.label(): 
 					# result <- all ADVP siblings
-					result = 
+					result = result | self.getADVPSiblings(siblings)
 
-
-		# search among the word’s uncles
 		# if noun(word) or adjective(word) 
+		if 'N' in word.label() or 'J' in word.label():
 			# if uncle = PP 
+			if 'PP' in uncle.label():
 				# result <- uncle subtree
+				result.add(uncle)
 		# else
+		else:
 			# if verb(word) and (uncle = verb) 
+			if 'V' in word.label() and 'V' in uncle.label():
 				# result <- uncle subtree
+				result.add(uncle)
 		# if result ≠ failure then return result else return failure
-
-		return {}
+		return result
 
 	def extractSubject(self,subtree):
 		# subject <- first noun found in NP_subtree
@@ -114,6 +116,31 @@ class TripletExtractor(object):
 		for child in self.tree:
 			if 'NP' in child.label():
 				return child
+
+	def getRBSiblings(self,siblings):
+		RBs = Set([])
+		for sibling in siblings:
+			if 'RB' in sibling.label(): 
+				RBs.add(sibling)
+		return RBs
+
+	# all DT, PRP$, POS, JJ, CD, ADJP, QP, NP siblings
+	def getMANYSiblings(self,siblings):
+		RBs = Set([])
+		for sibling in siblings:
+			if 'DT' in sibling.label() or 'PRP' in sibling.label() or 'POS' in sibling.label() or 'JJ' in sibling.label(): 
+				RBs.add(sibling)
+			if 'ADJP' in sibling.label() or 'QP' in sibling.label() or 'NP' in sibling.label() or 'CD' in sibling.label():
+				RBs.add(sibling)
+		return RBs
+
+	# getADVPSiblings
+	def getADVPSiblings(self,siblings):
+		RBs = Set([])
+		for sibling in siblings:
+			if 'ADVP' in sibling.label(): 
+				RBs.add(sibling)
+		return RBs
 
 	# Return first noun or none
 	def FindFirstNoun(self,subtree):
