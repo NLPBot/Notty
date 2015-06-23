@@ -4,7 +4,7 @@ ________________________________________________________________________________
 
 * CONTENTS OF THIS FILE
 	* Introduction
-	* How it works?
+	* Modules
 	* Extraction of knowledge graph
 ________________________________________________________________________________________________________
 	
@@ -12,7 +12,7 @@ ________________________________________________________________________________
 __________________
 	An Application that automatically generate power point content.
 
-* How it works?
+* Modules
 __________________
 
 	- 3 types of input: 
@@ -45,6 +45,9 @@ __________________
 	- KnowledgeGraph:
 		1. Construct a hidden knowledge graph storing all slide points and titles
 
+	- QueryProcessor:
+		1. Process queries
+
 * Extraction of knowledge graph
 __________________
 
@@ -53,7 +56,13 @@ __________________
 	- Create triples, add to graph.
 	- "TRIPLET EXTRACTION FROM SENTENCES" http://ailab.ijs.si/dunja/SiKDD2007/Papers/Rusu_Trippels.pdf
 	
+	- Question processing
+		- Decide the name-entity type of the answer
+		- Choose query words <----
+		- Definition question, math question or list question?
+		- Find relation between entities in the question
 
+	 -> make queries -> process docs
 
 
 

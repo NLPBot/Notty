@@ -4,6 +4,7 @@ from gensim import corpora, models, similarities
 from collections import defaultdict
 from nltk.corpus import stopwords
 from KnowledgeGraph import K_Graph
+from stat_parser import Parser
 
 # A class that process raw search results &
 # chooses valid information
@@ -34,7 +35,11 @@ class InfoExtractor(object):
 		texts = []
 		new_indices = []
 		index = 0
+		parser = Parser()
 		for sent in sents:
+			# Extract triplets & store in neo4j database
+			tripletExtractor(parser.parse(sent))
+			# Process sent
 			tokens = sent.split()
 			if len(self.removeSingleOccurWords(self.removeStopWords(tokens)))>0:
 				texts.append(self.removeStopWords(tokens))
@@ -47,6 +52,10 @@ class InfoExtractor(object):
 		for index in self.DocumentSIMQuery():
 			new_sents.append(sents[index])
 		return new_sents
+
+	def tripletExtractor(self,tree):
+		
+		return 0
 
 	def makeDictAndCorpus(self,texts):
 		dictionary = corpora.Dictionary(texts)
@@ -63,7 +72,6 @@ class InfoExtractor(object):
 		# Set up single doc for query
 		k_graph = K_Graph().load() # Obtain knowledge graph
 		topic = k_graph.get_topic()
-		#topic = 'The Qing dynasty of China later defeated the kingdom and annexed Taiwan.'
 		vec_bow = dictionary.doc2bow(topic.lower().split())
 		vec_lsi = lsi[vec_bow] # convert the query to LSI space
 
