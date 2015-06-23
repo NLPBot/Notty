@@ -7,18 +7,18 @@ class TripletExtractor(object):
 		self.tree = tree
 		self.max_level = 0
 		self.deepest_verb = None
+		self.first_noun = None
 	
 	# Return a set consisting of triplet [ subj, pred, obj ]
 	def extract(self):
 		#print(' WITHIN extract ...... ')
-
 		# First get all the sets
 		att = subj = pred = obj = []
 		subj = self.extractSubject(self.getNPSubtree())
 		pred = self.extractPredicate(self.getVPSubtree())
 		for VPSibling in self.getVPSiblings():
 			if len(VPSibling)>0:
-				obj.extend(self.extractObject(VPSibling))
+				obj = obj + self.extractObject(VPSibling)
 		# Handle Empty Sets
 		if subj==None or pred==None or obj==None:
 			return []
@@ -29,85 +29,82 @@ class TripletExtractor(object):
 		elif len(obj)==0:
 			return []
 		else:
-			return ((att.extend(subj)).extend(pred)).extend(obj)
+			return (att+subj+pred+obj)
 
 	# Returns a list containing attributes
 	def extractAttribute(self,word):
 		#print(' WITHIN extractAttribute ...... ')
-
 		result = []
 		if word==None:
 			return result
 		# Get siblings
 		siblings = self.getSiblings(self.tree,word)
-		uncles = self.getUncles(self.tree,word)
+		#uncles = self.getUncles(self.tree,word)
 
 		# if adjective(word) 
 		if 'J' in word.label():
 			# result <- all RB siblings 
-			result.extend(self.getRBSiblings(siblings)[0])
+			result = result + self.getRBSiblings(siblings)[0]
 		# else
 		else:
 			# if noun(word) 
 			if 'N' in word.label():
 				# result <- all DT, PRP$, POS, JJ, CD, ADJP, QP, NP siblings
-				result.extend(self.getMANYSiblings(siblings))
+				result = result + self.getMANYSiblings(siblings)
 			# else
 			else:
 				# if verb(word)
 				if 'V' in word.label(): 
 					# result <- all ADVP siblings
-					result.extend(self.getADVPSiblings(siblings))
+					result = result + self.getADVPSiblings(siblings)
 
-		for uncle in uncles:
+#		for uncle in uncles:
 			# if noun(word) or adjective(word) 
-			if 'N' in word.label() or 'J' in word.label():
+#			if 'N' in word.label() or 'J' in word.label():
 				# if uncle = PP 
-				if 'PP' in uncle.label():
+#				if 'PP' in uncle.label():
 					# result <- uncle subtree
-					result.append(uncle)
+#					result.append(uncle)
 			# else
-			else:
+#			else:
 				# if verb(word) and (uncle = verb) 
-				if 'V' in word.label() and 'V' in uncle.label():
+#				if 'V' in word.label() and 'V' in uncle.label():
 					# result <- uncle subtree
-					result.append(uncle)
+#					result.append(uncle)
 		# if result != failure then return result else return failure
 		return result
 
 	def extractSubject(self,subtree):
 		#print(' WITHIN extractSubject ...... '+str(subtree))
-
 		# subject <- first noun found in NP_subtree
-		result = subject = []
-		if self.FindFirstNoun(subtree)==None:
-			return result
+		if self.FindFirstNoun(self.tree)==None:
+			return []
 		else:
-			subject.append(self.FindFirstNoun(subtree))
-		# subjectAttributes <- EXTRACT-ATTRIBUTES(subject) 
-		subjectAttributes = self.extractAttribute(subtree)
-		# result <- subject | subjectAttributes
-		result = subject.extend(subjectAttributes)
-		# if result != failure then return result 
-		# else return failure
-		return result
+			result = subject = []
+			# subject <- first noun found in NP_subtree 
+			subject.append(self.first_noun)
+			# subjectAttributes <- EXTRACT-ATTRIBUTES(subject) 
+			subjectAttributes = self.extractAttribute(subtree)
+			# result <- subject | subjectAttributes
+			result = subject + subjectAttributes
+			# if result != failure then return result 
+			# else return failure
+			return result
 
 	def extractPredicate(self,VP_subtree):
 		#print(' WITHIN extractPredicate ...... ')
-
 		# predicate <- deepest verb found in VP_subtree 
 		predicate = self.FindDeepestVerb(VP_subtree,0)
 		# predicateAttributes <- EXTRACT-ATTRIBUTES(predicate) 
 		predicateAttributes = self.extractAttribute(predicate)
 		# result <- predicate | predicateAttributes 
-		result = predicate.extend(predicateAttributes)
+		result = [predicate] + predicateAttributes
 		# if result != failure then return result 
 		# else return failure 
 		return result
 
 	def extractObject(self,VP_sbtree):
 		#print(' WITHIN extractObject ...... ' + str(VP_sbtree))
-
 		siblings = self.getSiblings(self.tree,VP_sbtree)
 		# siblings <- find NP, PP and ADJP siblings of VP_subtree 
 		# for each value in siblings do 
@@ -130,47 +127,46 @@ class TripletExtractor(object):
 		if object==None:
 			return result
 		else:
-			result = [object].extend(objectAttributes)
+			return [object] + objectAttributes
 
-	def getUncles(self,tree,target):
+	def getUncles(self,tree,ref):
 		#print(' WITHIN getUncles ...... ')
-
 		uncles = []
-		if len(tree)==1:
+		if (tree.height())==3:
 			return uncles
 		found = False
 		for child in tree:
-			if target.label() in child.label():
+			if str(ref.label()) == str(child.label()):
 				found = True
 				break
-			uncles.extend(self.getUncles(child,target))
+			uncles = uncles + self.getUncles(child,ref)
 		if found == True:
 			uncles = self.getSiblings(self.tree,tree)
 		return uncles
 
-	def getSiblings(self,tree,target):
-		print(' WITHIN getSiblings ...... ')
+	def getSiblings(self,tree,ref):
+		#print(' WITHIN getSiblings ...... ')
 		siblings = []
 		if (tree.height())==2:
 			return siblings
 		found = False
 		for child in tree:
 			try:
-				if str(target.label()) == str(child.label()):
+				if str(ref.label()) == str(child.label()):
 					found = True
 					break
 			except AttributeError:
 				print('AttributeError!')
 				return siblings
-			siblings.extend(self.getSiblings(child,target))
+			siblings = siblings + self.getSiblings(child,ref)
 		if found == True:
 			for child in tree:
-				siblings.append(child)
+				if str(ref.label()) not in str(child.label()):
+					siblings.append(child)
 		return siblings
 
 	def getVPSubtree(self):
 		#print(' WITHIN getVPSubtree ...... ')
-
 		for child in self.tree:
 			if 'VP' in child.label():
 				return child
@@ -187,16 +183,14 @@ class TripletExtractor(object):
 
 	def getNPSubtree(self):
 		#print(' WITHIN getNPSubtree ...... ')
-
 		for child in self.tree:
 			if 'NP' in child.label():
 				return child
 
 	def getRBSiblings(self,siblings):
 		#print(' WITHIN getRBSiblings ...... ')
-
 		RBs = []
-		for sibling in siblings.subtrees():
+		for sibling in siblings:
 			if 'RB' in sibling.label(): 
 				RBs.append(sibling)
 		return RBs
@@ -204,7 +198,6 @@ class TripletExtractor(object):
 	# all DT, PRP$, POS, JJ, CD, ADJP, QP, NP siblings
 	def getMANYSiblings(self,siblings):
 		#print(' WITHIN getMANYSiblings ...... ')
-
 		RBs = []
 		for sibling in siblings:
 			if 'DT' in sibling.label() or 'PRP' in sibling.label() or 'POS' in sibling.label() or 'JJ' in sibling.label(): 
@@ -216,7 +209,6 @@ class TripletExtractor(object):
 	# getADVPSiblings
 	def getADVPSiblings(self,siblings):
 		#print(' WITHIN getADVPSiblings ...... ')
-
 		RBs = []
 		for sibling in siblings:
 			if 'ADVP' in sibling.label(): 
@@ -226,22 +218,19 @@ class TripletExtractor(object):
 	# Return first noun or none
 	def FindFirstNoun(self,subtree):
 		#print(' WITHIN FindFirstNoun ...... ')
-
-		first_noun = []
 		NP_tree = None
 		for child in subtree:
 			if 'NP' in child.label(): 
 				NP_tree = child
 		if NP_tree is not None:
 			for n in NP_tree:
-				if 'NN' in n.label():
-					first_noun.append(n)
-		return first_noun
+				if 'NN' in n.label() or 'PRP' in n.label():
+					self.first_noun = n
+		return self.first_noun
 
 	# Return deepest verb or none
 	def FindDeepestVerb(self,VP_subtree,level):
 		#print(' WITHIN FindDeepestVerb ...... ')
-
 		level += 1
 		if len(VP_subtree)==1:
 			if 'V' in VP_subtree.label():
