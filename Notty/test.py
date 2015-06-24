@@ -14,7 +14,7 @@ tree_list = []
 #	print(sent)
 #	tree_list.append(parser.parse(sent))
 tree_list.append(parser.parse('I love you'))
-tree_list.append(parser.parse('A rare black squirrel has become a regular visitor to a suburban garden.'))
+#tree_list.append(parser.parse('A rare black squirrel has become a regular visitor to a suburban garden.'))
 
 ### Test for TripletExtractor ###
 for t in tree_list:
@@ -35,16 +35,11 @@ for t in tree_list:
 	#print(' getSiblings of '+str(e.getVPSubtree())+'   '+str(e.getSiblings(t,e.getVPSubtree()))) # getSiblings
 		
 	#print(''+str(e.)) # getUncles
-	#print(''+str(e.extractAttribute(e.getNPSubtree()))) # extractAttribute
+	print(''+str(e.extractAttribute(e.getNPSubtree()))) # extractAttribute
 
-	print(' extractSubject '+str(e.extractSubject(e.getNPSubtree()))) # extractSubject
-	print(' extractPredicate '+str(e.extractPredicate(e.getVPSubtree()))) # extractPredicate
-	print(' extractObject '+str(e.extractObject(e.getVPSubtree()))) # extractObject
-	obj = []
-	for VPSibling in e.getVPSiblings():
-		if len(VPSibling)>0:
-			obj = obj + e.extractObject(VPSibling)
-	print(' extractObject '+str(obj)) # extractObject
+	#print(' extractSubject '+str(e.extractSubject(e.getNPSubtree()))) # extractSubject
+	#print(' extractPredicate '+str(e.extractPredicate(e.getVPSubtree()))) # extractPredicate
+	#print(' extractObject '+str(e.extractObject())) # extractObject
 
 	#print('deepest verb is: ' + str(e.FindDeepestVerb(t,0).label())) # FindDeepestVerb
 	#print(' First Noun is: ' + str(e.FindFirstNoun(t))) # FindFirstNoun
