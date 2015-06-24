@@ -37,7 +37,7 @@ class TripletExtractor(object):
 			return result
 		# Get siblings
 		siblings = self.getSiblings(self.tree,word)
-		#uncles = self.getUncles(self.tree,word)
+		uncles = self.getUncles(self.tree,word)
 
 		# if adjective(word) 
 		if 'J' in word.label():
@@ -55,20 +55,19 @@ class TripletExtractor(object):
 				if 'V' in word.label(): 
 					# result <- all ADVP siblings
 					result = result + self.getADVPSiblings(siblings)
-
-#		for uncle in uncles:
+		for uncle in uncles:
 			# if noun(word) or adjective(word) 
-#			if 'N' in word.label() or 'J' in word.label():
+			if 'N' in word.label() or 'J' in word.label():
 				# if uncle = PP 
-#				if 'PP' in uncle.label():
+				if 'PP' in uncle.label():
 					# result <- uncle subtree
-#					result.append(uncle)
+					result.append(uncle)
 			# else
-#			else:
+			else:
 				# if verb(word) and (uncle = verb) 
-#				if 'V' in word.label() and 'V' in uncle.label():
+				if 'V' in word.label() and 'V' in uncle.label():
 					# result <- uncle subtree
-#					result.append(uncle)
+					result.append(uncle)
 		# if result != failure then return result else return failure
 		return result
 
@@ -135,15 +134,17 @@ class TripletExtractor(object):
 	def getUncles(self,tree,ref):
 		#print(' WITHIN getUncles ...... ')
 		uncles = []
-		if (tree.height())==3:
+		if (tree.height())==2:
 			return uncles
 		found = False
 		for child in tree:
 			if ref==child:
 				found = True
 				break
-			uncles = uncles + self.getUncles(child,ref)
+			else:
+				uncles = uncles + self.getUncles(child,ref)
 		if found == True:
+			#print(' father is ' + str(tree))
 			uncles = self.getSiblings(self.tree,tree)
 		return uncles
 
@@ -164,7 +165,7 @@ class TripletExtractor(object):
 			siblings = siblings + self.getSiblings(child,ref)
 		if found == True:
 			for child in tree:
-				if str(ref.label()) not in str(child.label()):
+				if not(ref==child):
 					siblings.append(child)
 		return siblings
 
