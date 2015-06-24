@@ -119,7 +119,7 @@ class TripletExtractor(object):
 				# object <- first adjective in value
 				object = sib
 			# objectAttributes <- EXTRACT-ATTRIBUTES(object) 
-			#objectAttributes = self.extractAttribute(object)
+			objectAttributes = self.extractAttribute(object)
 		# result <- object | objectAttributes 
 		if object==None:
 			return result
