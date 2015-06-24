@@ -13,21 +13,17 @@ class TripletExtractor(object):
 	def extract(self):
 		#print(' WITHIN extract ...... ')
 		# First get all the sets
-		att = subj = pred = obj = []
+		subj = pred = obj = []
 		subj = self.extractSubject(self.getNPSubtree())
 		pred = self.extractPredicate(self.getVPSubtree())
 		obj = obj + self.extractObject()
 		# Handle Empty Sets
 		if subj==None or pred==None or obj==None:
 			return []
-		if len(subj)==0: 
-			return []
-		elif len(pred)==0:
-			return [] 
-		elif len(obj)==0:
+		if len(subj)==0 or len(pred)==0 or len(obj)==0: 
 			return []
 		else:
-			return (att+subj+pred+obj)
+			return (subj+pred+obj)
 
 	# Returns a list containing attributes
 	def extractAttribute(self,word):

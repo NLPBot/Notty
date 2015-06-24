@@ -14,8 +14,9 @@ tree_list = []
 #	print(sent)
 #	tree_list.append(parser.parse(sent))
 tree_list.append(parser.parse('I love you'))
-tree_list.append(parser.parse('A rare black squirrel has become a regular visitor to a suburban garden.'))
+#tree_list.append(parser.parse('A rare black squirrel has become a regular visitor to a suburban garden.'))
 #tree_list.append(parser.parse('Moreover, for each element composing the triplet, we find its attributes'))
+#tree_list.append(parser.parse('In the past couple of decades the tide has changed somewhat as we moved to an information economy rather than an industrial one.'))
 
 ### Test for TripletExtractor ###
 for t in tree_list:
