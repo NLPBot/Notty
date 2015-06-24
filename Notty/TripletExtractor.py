@@ -80,8 +80,7 @@ class TripletExtractor(object):
 			subjectAttributes = self.extractAttribute(subtree)
 			# result <- subject | subjectAttributes
 			result = subject + subjectAttributes
-			# if result != failure then return result 
-			# else return failure
+			# if result != failure then return result else return failure
 			return result
 
 	def extractPredicate(self,VP_subtree):
@@ -92,8 +91,7 @@ class TripletExtractor(object):
 		predicateAttributes = self.extractAttribute(predicate)
 		# result <- predicate | predicateAttributes 
 		result = [predicate] + predicateAttributes
-		# if result != failure then return result 
-		# else return failure 
+		# if result != failure then return result else return failure 
 		return result
 
 	def extractObject(self):
@@ -127,6 +125,7 @@ class TripletExtractor(object):
 			#return [object] + objectAttributes
 			return [object]
 
+	# Get Uncles
 	def getUncles(self,tree,ref):
 		#print(' WITHIN getUncles ...... ')
 		uncles = []
@@ -144,6 +143,7 @@ class TripletExtractor(object):
 			uncles = self.getSiblings(self.tree,tree)
 		return uncles
 
+	# Get siblings
 	def getSiblings(self,tree,ref):
 		#print(' WITHIN getSiblings ...... ')
 		siblings = []
@@ -165,6 +165,7 @@ class TripletExtractor(object):
 					siblings.append(child)
 		return siblings
 
+	# Get VP subtree
 	def getVPSubtree(self):
 		#print(' WITHIN getVPSubtree ...... ')
 		for child in self.tree:
